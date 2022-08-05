@@ -1,0 +1,42 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    container_name: app
+    depends_on:
+      - mysql
+    ports:
+      - 8080:80
+    networks:
+      hillel:
+          ipv4_address: 192.168.10.56
+
+  mysql:
+    image: mysql:8.0
+    container_name: database
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=crud_db
+      - MYSQL_USER=crud_user
+      - MYSQL_PASSWORD=cruduserpassword
+    ports:
+      - '3306:3306'
+    volumes:
+      - db:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      hillel:
+          ipv4_address: 192.168.10.55
+
+volumes:
+  db:
+    driver: local
+
+networks:
+  hillel:
+    name: hillel
+    driver: bridge
+    ipam:
+        config:
+        - subnet: 192.168.10.0/24
+          gateway: 192.168.10.254
